@@ -120,33 +120,4 @@ if ($status) {
         }
 } else {
     Write-Host "$script:userID Account Status is normal!" -ForegroundColor Green
-} #Improvement: Create ticket to ServiceNow 
-
-write-progress "Get San number List from CCM..."
-$gcArgs = @{
-    NameSpace="root\sms\site_ADE"
-    Computer ="adesccm12.santos.com"
-    query = "select *  
-    from  SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId
-    where SMS_R_System.LastLogonUserName='$script:userID'"
-}
-$computers = Get-CimInstance @gcArgs
-write-progress "Get San number info from CCM..."
-Write-Host "List of computers user is recorded as last logged in from CCM:"  -ForegroundColor Yellow
-foreach($computer in $computers){  
-    $Name = $computer.SMS_R_System.Name
-    $Manufacturer = $computer.SMS_G_System_COMPUTER_SYSTEM.Manufacturer
-    $Model = $computer.SMS_G_System_COMPUTER_SYSTEM.Model
-    $IPAddresses = $computer.SMS_R_System.IPAddresses[0]
-    $TimeStamp = $computer.SMS_G_System_COMPUTER_SYSTEM.TimeStamp
-    $LastLogonTimestamp = $computer.SMS_R_System.LastLogonTimestamp
-    $LastUserLogin =  (get-aduser $computer.SMS_R_System.LastLogonUserName).Name
-    Write-Host "==========================================" -ForegroundColor Yellow
-    Write-Host "SanNumber:        $Name"
-    Write-Host "Brand:            $Manufacturer $Model"
-    Write-Host "IP:               $IPAddresses"
-    Write-Host "LastCcmHeartBeat: $TimeStamp"
-    Write-Host "LastLoginTime:    $LastLogonTimestamp"
-    Write-Host "LastUserLogin:    $LastUserLogin"
-    Write-Host "    " 
-}
+} 
