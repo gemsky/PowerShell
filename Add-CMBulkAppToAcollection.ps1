@@ -13,7 +13,8 @@
     $curLoc = (Get-Location).Path
 
     #if no connected to CM Drive - Connect!
-    if ((Get-Location).Path -eq "ADE:\") {
+    $sccmSitecode = Read-Host "Enter SCCM Site Code e.g: 'PER:\'"
+    if ((Get-Location).Path -eq $sccmSitecode) {
         Write-Host "Confirmed connection to CM Drive" -ForegroundColor Green
     } else {
         Write-Warning "Not connected to CM Drive - connecting..."
@@ -94,6 +95,6 @@ foreach ($app in $goodApps) {
 
 #End Script by returning to original drive location
 #if connected to CM Drive - Reverse Connection!
-if ((Get-Location).Path -eq "ADE:\") {
+if ((Get-Location).Path -eq $sccmSitecode) {
     Set-Location -path $curLoc   
 }
