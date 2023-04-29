@@ -57,6 +57,17 @@ if ($rdpEnabled -eq 0) {
     Write-Warning "Remote Desktop is not enabled."
 }
 
+# Disable Device Windows Hello PasswordLess reg 
+$regPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\PasswordLess\Device"
+$valueName = "DevicePasswordLessBuildVersion"
+$currentValue = (Get-ItemProperty -Path $regPath -Name $valueName -ErrorAction SilentlyContinue)."$valueName"
+if ($currentValue -ne 0) {
+    Write-Host "Windows Hello PasswordLess is currently enabled."
+}
+else {
+    Write-Host "Windows Hello PasswordLess is turned off"
+}
+
 # Check if Remote Desktop Services is running and display the current status
 $rdpService = Get-Service -Name TermService
 if ($rdpService.Status -eq "Running") {
@@ -66,21 +77,13 @@ if ($rdpService.Status -eq "Running") {
 }    
 } #end function Get-RdpServiceStatus
 
-function Enable-RdpOnPrivateNetwork {
-[CmdletBinding()]
+function Enable-RdpOnPrivateNetwork {[CmdletBinding()]
 param (
     [Parameter(Mandatory=$true, Position=0, HelpMessage="Enter the user name to add to the Remote Desktop Users group")]
     [string]
     $UserName
 )
-# Add user account to Remote Desktop Users group
-Add-LocalGroupMember -Group "Remote Desktop Users" -Member $UserName
 
-# Check network connection profile and set it to Private if currently set to Public
-$networkProfile = Get-NetConnectionProfile
-if ($networkProfile.NetworkCategory -eq "Public") {
-    Set-NetConnectionProfile -NetworkCategory Private
-}
 <#
 .SYNOPSIS
 Enables Remote Desktop connections and allows incoming traffic to the Remote Desktop port in the Windows Firewall on a private network profile.
@@ -102,14 +105,41 @@ Last Updated: [29/04/2023]
 
 #> 
 
+# Add user account to Remote Desktop Users group
+Add-LocalGroupMember -Group "Remote Desktop Users" -Member $UserName
+Write-Host "User account added to Remote Desktop Users group."
+
+# Check network connection profile and set it to Private if currently set to Public
+$networkProfile = Get-NetConnectionProfile
+if ($networkProfile.NetworkCategory -eq "Public") {
+    Set-NetConnectionProfile -NetworkCategory Private
+}
+Write-Host "Network Connection Profile: $($networkProfile.Name)"
+
 # Enable Remote Desktop inbound traffic from the Private network profile in the Windows Firewall
 New-NetFirewallRule -DisplayName "Allow RDP from Private network" -Direction Inbound -LocalPort 3389 -Protocol TCP -Action Allow -Profile Private
+Write-Host "Firewall rule for RDP traffic from Private network created."
+
+# Disable DevicePasswordLess reg 
+$regPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\PasswordLess\Device"
+$valueName = "DevicePasswordLessBuildVersion"
+$currentValue = (Get-ItemProperty -Path $regPath -Name $valueName -ErrorAction SilentlyContinue)."$valueName"
+if ($currentValue -ne 0) {
+    Set-ItemProperty -Path $regPath -Name $valueName -Value 0 -Type DWORD
+    Write-Host "DevicePasswordLess Value changed from $currentValue to 0."
+}
+else {
+    Write-Host "DevicePasswordLess Value is already 0. No changes made."
+}
 
 # Enable Remote Desktop connections
 Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+Write-Host "Remote Desktop enabled."
 
 # Restart the Remote Desktop Services service
-Restart-Service -Name TermService    
+Restart-Service -Name TermService
+Write-Host "Remote Desktop Services restarted."
+
 } #end function Enable-RdpOnPrivateNetwork
 
 Write-Host "This script checks the current status of Remote Desktop connections and Windows Firewall rules for Remote Desktop."
