@@ -12,8 +12,7 @@ if (Get-Module -ListAvailable -Name MSOnline) {
 }
 
 #Check if connected to msol 
-$user = "Gemma" #Change this to your username
-$test = Get-MsolUser -SearchString $user -ErrorAction SilentlyContinue
+$test = Get-MsolUser -SearchString $env:USERNAME -ErrorAction SilentlyContinue
 if ($test -eq $null) {
 	Write-Warning "Not connected to MSOL, connecting now!"
     Write-Progress -Activity "Connecting to MSOL" -Status "Connecting to MSOL"
