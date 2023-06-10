@@ -8,8 +8,34 @@ function CMaddBulkPcToAcollection {
         [String]
         $appkeyword
     )
+<#
+.SYNOPSIS
+Adds multiple PCs to a CCM app collection in SCCM.
 
-    #Script to add PC to a  CCM app collection
+.DESCRIPTION
+This function allows you to add multiple PCs to a Configuration Manager (SCCM) app collection. It requires the SCCM module to be installed and a valid connection to the SCCM drive. It prompts you to enter the keyword to search for the app collection and provides a text file to enter the list of PC names. It validates the PC names, checks if they exist in SCCM, and adds them to the specified app collection if they are not already members.
+
+.PARAMETER appkeyword
+The keyword used to search for the app collection in SCCM.
+
+.INPUTS
+System.String.
+
+.OUTPUTS
+None.
+
+.NOTES
+- This function requires the SCCM module to be installed.
+- Make sure you have the necessary permissions to perform SCCM operations.
+- The PC names should be provided in a text file, with each PC name on a separate line.
+- Only the PC names that exist in SCCM will be added to the app collection.
+
+.EXAMPLE
+PS> CMaddBulkPcToAcollection -appkeyword "AppName"
+This example prompts you to enter the keyword to search for the app collection. It opens a text file where you can enter the PC names, validates the PC names, and adds them to the specified app collection in SCCM.
+
+#>
+
     #check CM module
     if ((Get-Module -Name "ConfigurationManager").Name) {
         
@@ -23,7 +49,7 @@ function CMaddBulkPcToAcollection {
     $curLoc = (Get-Location).Path
     
     #if no connected to CM Drive - Connect!
-    if ((Get-Location).Path -eq "ADE:\") {
+    if ((Get-Location).Path -eq "NYC:\") {
         Write-Host "Confirmed connection to CM Drive" -ForegroundColor Green
     } else {
         Write-Warning "Not connected to CM Drive - connecting..."
@@ -161,7 +187,7 @@ function CMaddBulkPcToAcollection {
     
     #End Script by returning to original drive location
     #if connected to CM Drive - Reverse Connection!
-    if ((Get-Location).Path -eq "ADE:\") {
+    if ((Get-Location).Path -eq "NYC:\") {
         Set-Location -path $curLoc
     } 
     
