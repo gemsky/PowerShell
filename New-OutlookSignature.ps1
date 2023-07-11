@@ -45,11 +45,11 @@ catch {
 
     #Convert image to base64
     Write-Progress -Activity "Updating  Signature" -Status "Getting banner images..." -PercentComplete 40
-            $imageUrl = "https://raw.githubusercontent.com/gemsky/PowerShell/main/CloudSmartSolutionBanner.png" #Change this to your own url
-            $imageBytes = (Invoke-WebRequest -Uri $imageUrl -UseBasicParsing).Content
-            # Convert the image to a base64-encoded string
-            $logo1 = [System.Convert]::ToBase64String($imageBytes)
-            $logo1Height = "height='140'"
+    $imageUrl = "https://raw.githubusercontent.com/gemsky/PowerShell/main/CloudSmartSolutionBanner.png" #Change this to your own url
+    $imageBytes = (Invoke-WebRequest -Uri $imageUrl -UseBasicParsing).Content
+    # Convert the image to a base64-encoded string
+    $logo1 = [System.Convert]::ToBase64String($imageBytes)
+    $logo1Height = "height='140'" # Adjust to your banner height
 
     # Get the users properties (These should always be in Active Directory and Unique)
     Write-Progress -Activity "Updating  Signature" -Status "Creating user Signature..." -PercentComplete 60
@@ -58,15 +58,15 @@ catch {
     if($user.mobile.count -gt 0){$mobileNumber = $user.mobile[0]}
     if($user.mail.count -gt 0){$email = $user.mail[0]}
 
-    #Create File Name
-    $filename = "Signature ($($email))"
-    $file  = "$signatureFolder\\$filename"
-
-    # BusinessAddress
+    # BusinessAddress and Website - adjust as needed
     $AdressLine1 = "Ground Floor, Suite 10 , Cloud Business Complex"
     $AdressLine2 = "10 Cloud Street, Smart, West Cloud 3333"
     $telephone = "+61 8 6333 3333"
     $website = "cloudSmart.com.au"
+
+    #Create File Name
+    $filename = "Signature ($($email))"
+    $file  = "$signatureFolder\\$filename"
 
 #-DO NOT CHANGE INDENTATION    
 Write-Progress -Activity "Updating  Signature" -Status "Building HTML file" -PercentComplete 80
@@ -192,4 +192,4 @@ $signature =
     cls
     Write-Progress -Activity "Updating  Signature" -Status "Pending user confirmation!" -PercentComplete 95
     $wshell = New-Object -ComObject Wscript.Shell
-    $wshell.Popup("Your  signature has been Updated. Please proceed to restart your device for change to take effect.", 0, "Microsoft Outlook  Signature Update.", 64)
+    $wshell.Popup("Your signature has been Updated. Please proceed to restart your device for change to take effect.", 0, "Microsoft Outlook  Signature Update.", 64)
