@@ -120,28 +120,7 @@ LogFunction "Connecting to Azure"
 Connect-AzAccount
 Set-AzContext -SubscriptionName "Azure Subscription 1"
 
-#Get Get passwords from Azure Key Vault
-    LogFunction "Getting passwords from Azure Key Vault"
-    $KeyVaultName = Read-Host -Prompt "Enter Key Vault Name"
-
-    #Get Device Admin password
-    $secretAccount = Read-Host "Enter secret account name"
-    $installerSecret = Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name $secretAccount -AsPlainText
-
-
-    $Path = Read-Host -Prompt "Enter path to CWC installer"
-    #List content in gridview and get full path of selected file
-    $CWC = Get-ChildItem -Path $Path | Select Name,FullName | sort Name | Out-GridView -Title "Select CWC Installer" -PassThru
-    $CwcFullPath = $CWC.FullName
-
-    #Install ScreenConnect aka CWC
-    LogFunction "Installing/Updating CWC"
-    #Copy $CwcFullPath to C:\Scratch\Software
-    $destination = "C:\Scratch\Software"
-    Copy-Item -Path $source -Destination $destination -Recurse -Force
-    
-    #Install CWC
-    Start-Process -FilePath $CwcFullPath -Wait -NoNewWindow
+#Get the key vault secret - Section removed for security reasons
 
 #Find sysprep.exe process and kill it
 LogFunction "Killing sysprep.exe process"
